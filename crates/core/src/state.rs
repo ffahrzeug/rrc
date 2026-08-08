@@ -69,3 +69,5 @@ pub enum Origin {
     /// on the state machine.
     Manual,
 }
+
+// TODO: is_crashed() for Service struct
