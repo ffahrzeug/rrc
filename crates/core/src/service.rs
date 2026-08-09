@@ -54,4 +54,10 @@ mod tests {
         let s = "letsgorustytogether";
         assert_eq!(format!("invalid service name: {}", s), ServiceName::new(s).unwrap_err().to_string());
     }
+
+    #[test]
+    fn service_name_contains_invalid_character() {
+        let s = "lets_g#_rusty";
+         assert_eq!(format!("invalid service name: {}", s), ServiceName::new(s).unwrap_err().to_string());
+    }
 }
