@@ -1,4 +1,8 @@
-#[derive(Copy, Clone)]
+use core::error;
+
+use thiserror::Error;
+
+#[derive(Copy, Clone, Debug)]
 pub enum State {
 	// The service has to be in one only at all times
     /// Not running. The default, resting state — no process, no dependents waiting on it.
@@ -72,6 +76,8 @@ pub enum Origin {
     Manual,
 }
 
+#[derive(Debug, Error)]
+#[error("invalid state transition: {from:?} -> {to:?}")]
 pub struct InvalidTransition {
     pub from: State,
     pub to: State,
