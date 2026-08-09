@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(try_from = "String", into = "String")]
 pub struct ServiceName(String);
 
 #[derive(Debug, thiserror::Error)]
-#[error("invalid service name: {0:?}")]
+#[error("invalid service name: {0}")]
 pub struct ServiceNameError(String);
 
 // Size of the kernel's `task_struct.comm` buffer (`include/linux/sched.h`).
@@ -36,5 +36,22 @@ impl TryFrom<String> for ServiceName {
 impl From<ServiceName> for String {
     fn from(s: ServiceName) -> Self {
         s.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_service_name() {
+        let s = "lets_go_rusty";
+        assert_eq!(s.to_string(), ServiceName::new(s).unwrap().0);
+    }
+
+    #[test]
+    fn service_name_len_more_than_fifteen() {
+        let s = "letsgorustytogether";
+        assert_eq!(format!("invalid service name: {}", s), ServiceName::new(s).unwrap_err().to_string());
     }
 }
