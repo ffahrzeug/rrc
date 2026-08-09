@@ -1,3 +1,4 @@
+#[derive(Copy, Clone)]
 pub enum State {
 	// The service has to be in one only at all times
     /// Not running. The default, resting state — no process, no dependents waiting on it.
@@ -23,14 +24,12 @@ bitflags::bitflags! {
         /// Kept as an explicit flag (rather than just falling back to Stopped) so
         /// dependents don't blindly retry a service that's already known to be broken.
         const FAILED       = 1 << 0;
-
         /// Waiting for a service it depends on to become ready before actually
         /// starting itself.
         ///
         /// Once that dependency reaches Started, it will look up who's scheduled on
         /// it and start them — this is how starts get deferred instead of failing.
         const SCHEDULED    = 1 << 1;
-
         /// Marks that the current Starting/Stopping transition began from Inactive,
         /// not from a fresh Stopped state.
         ///
@@ -38,6 +37,9 @@ bitflags::bitflags! {
         /// service" apart from "starting cold", so they don't needlessly block-wait
         /// on what looks like the same Starting flag either way.
         const WAS_INACTIVE = 1 << 2;
+        /// Set when the service moved directly from Started/Inactive to Stopped,
+        /// i.e. the process died on its own — no stop() was ever running.
+        const CRASHED      = 1 << 3;
     }
 }
 pub enum Origin {
@@ -68,6 +70,49 @@ pub enum Origin {
     /// runlevel switch — if the user wants it to survive, that's on the user, not
     /// on the state machine.
     Manual,
+}
+
+pub struct InvalidTransition {
+    pub from: State,
+    pub to: State,
+}
+
+impl State {
+
+    pub fn transition(self, to: State) -> Result<State, InvalidTransition> {
+        use State::*;
+
+        let valid = matches!(
+            (self, to),
+            // launching (start() called)
+            (Stopped, Starting)
+            | (Inactive, Starting)
+
+            // start() resolves
+            | (Starting, Started)   // fully up
+            | (Starting, Inactive)  // alive, not ready yet (warm-up)
+            | (Starting, Stopped)   // failed before ever coming up
+
+            // shutting down (stop() called)
+            | (Started, Stopping)
+            | (Inactive, Stopping)
+
+            // stop() resolves
+            | (Stopping, Stopped)   // fully down
+            | (Stopping, Started)   // aborted, was fully up
+            | (Stopping, Inactive)  // aborted, was only inactive
+
+            // crash: process died on its own, no stop() ever ran
+            | (Started, Stopped)
+            | (Inactive, Stopped)
+        );
+
+        if valid {
+            Ok(to)
+        } else {
+            Err(InvalidTransition { from: self, to })
+        }
+    }
 }
 
 // TODO: is_crashed() for Service struct
