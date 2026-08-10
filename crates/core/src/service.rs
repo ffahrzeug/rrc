@@ -39,6 +39,36 @@ impl From<ServiceName> for String {
     }
 }
 
+pub enum DepKind {
+    /// Hard requirement: pull the target in, start it first, fail if it fails.
+    /// On shutdown, dependants are stopped before the target. (`sshd` needs `net`)
+    Need,
+    /// Like [`Need`](Self::Need), but the target's failure is tolerated —
+    /// we start anyway. For optional extras such as a metrics exporter.
+    Want,
+    /// Order after the target only if something else already put it in the plan;
+    /// otherwise a no-op. "I use it when it's around" — e.g. `use logger`.
+    Use,
+    /// Pure ordering: target first if present, no functional claim.
+    After,
+    /// Mirror of [`After`](Self::After): we start first, and stop last.
+    /// Lets a unit insert itself into an ordering it doesn't own (`before net`).
+    Before,
+}
+
+pub struct Dependency {
+    pub kind: DepKind,
+    pub target: ServiceName,
+}
+
+pub struct Service {
+    pub name: ServiceName,
+    pub desc: String, // TODO: choose right data structure
+    pub provides: Vec<ServiceName>, // TODO: choose right data structure
+    pub deps: Vec<Dependency>, // TODO: choose right data structure
+    pub runlevels: Vec<String>, // TODO: choose right data structure
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
