@@ -1,3 +1,5 @@
+use std::path::{Path, PathBuf};
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -63,15 +65,22 @@ pub struct Dependency {
 
 pub struct Service {
     pub name: ServiceName,
-    pub desc: String, // TODO: choose right data structure
-    pub provides: Vec<ServiceName>, // TODO: choose right data structure
-    pub deps: Vec<Dependency>, // TODO: choose right data structure
-    pub runlevels: Vec<String>, // TODO: choose right data structure
+    pub desc: String,
+    pub provides: Vec<ServiceName>,
+    pub deps: Vec<Dependency>, 
+    pub runlevels: Vec<String>,
+
+    // path to executable
+    pub executable: PathBuf,
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::path::PathBuf;
+
+use tempfile::NamedTempFile;
+
+use super::*;
 
     #[test]
     fn valid_service_name() {
@@ -89,5 +98,18 @@ mod tests {
     fn service_name_contains_invalid_character() {
         let s = "lets_g#_rusty";
          assert_eq!(format!("invalid service name: {}", s), ServiceName::new(s).unwrap_err().to_string());
+    }
+
+    #[test]
+    fn run_simple_service() {
+        let mock_executable = NamedTempFile::new();
+        let scirpt_content = r#"#!/bin/sh
+        echo "Service started"
+        while true; do
+            sleep 1
+        done
+        "#;
+        
+        todo!();
     }
 }
