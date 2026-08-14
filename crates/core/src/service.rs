@@ -69,9 +69,6 @@ pub struct Service {
     pub provides: Vec<ServiceName>,
     pub deps: Vec<Dependency>, 
     pub runlevels: Vec<String>,
-
-    // path to executable
-    pub executable: PathBuf,
 }
 
 #[cfg(test)]
@@ -98,18 +95,5 @@ use super::*;
     fn service_name_contains_invalid_character() {
         let s = "lets_g#_rusty";
          assert_eq!(format!("invalid service name: {}", s), ServiceName::new(s).unwrap_err().to_string());
-    }
-
-    #[test]
-    fn run_simple_service() {
-        let mock_executable = NamedTempFile::new();
-        let scirpt_content = r#"#!/bin/sh
-        echo "Service started"
-        while true; do
-            sleep 1
-        done
-        "#;
-        
-        todo!();
     }
 }
