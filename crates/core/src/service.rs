@@ -73,11 +73,7 @@ pub struct Service {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-
-use tempfile::NamedTempFile;
-
-use super::*;
+    use super::*;
 
     #[test]
     fn valid_service_name() {
