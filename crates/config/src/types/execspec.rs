@@ -2,9 +2,11 @@ pub struct ExecSpec {
     // command to strart service
     pub start: Argv,
     // command to stop service
-    pub stop: Argv,
+    pub stop: Option<Argv>,
     // command to reload service
-    pub reload: Argv,
+    pub reload: Option<Argv>,
+
+    // todo: cpu/memory/io/network limits
 }
 
 pub struct Argv(Vec<String>);
