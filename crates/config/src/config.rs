@@ -1,5 +1,9 @@
 use std::{fs, path::{Path, PathBuf}};
 
+use anyhow::Ok;
+
+use crate::types::unit::Unit;
+
 fn find_service_files(dir: &Path) -> anyhow::Result<Vec<PathBuf>> {
     let mut result = Vec::new();
     let entries = fs::read_dir(dir)?;
@@ -16,4 +20,10 @@ fn find_service_files(dir: &Path) -> anyhow::Result<Vec<PathBuf>> {
     }
 
     Ok(result)
+}
+
+fn parse_service_file(path: PathBuf) -> anyhow::Result<Unit> {
+    let content = fs::read_to_string(path)?;
+    let unit = toml::from_str(&content)?;
+    Ok(unit)
 }
