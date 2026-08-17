@@ -39,6 +39,7 @@ impl From<ServiceName> for String {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub enum DepKind {
     /// Hard requirement: pull the target in, start it first, fail if it fails.
     /// On shutdown, dependants are stopped before the target. (`sshd` needs `net`)
@@ -56,11 +57,13 @@ pub enum DepKind {
     Before,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Dependency {
     pub kind: DepKind,
     pub target: ServiceName,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Service {
     pub name: ServiceName,
     pub desc: String,

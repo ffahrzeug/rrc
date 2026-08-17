@@ -6,3 +6,5 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.104"
 core = { path = "../core" }
+serde = "1.0.229"
+toml = "1.1.4"

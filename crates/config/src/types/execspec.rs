@@ -1,3 +1,6 @@
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct ExecSpec {
     // command to strart service
     pub start: Argv,
@@ -9,6 +12,7 @@ pub struct ExecSpec {
     // todo: cpu/memory/io/network limits
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Argv(Vec<String>);
 
 impl From<String> for Argv {
