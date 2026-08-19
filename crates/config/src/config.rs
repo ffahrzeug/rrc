@@ -4,6 +4,18 @@ use anyhow::Ok;
 
 use crate::types::unit::Unit;
 
+fn load_units(dir: &Path) -> anyhow::Result<Vec<Unit>> {
+    let service_files = find_service_files(dir)?;
+
+    let mut units = vec![];
+    for service_file in &service_files {
+        let parsed_unit = parse_service_file(service_file)?;
+        units.push(parsed_unit);
+    }
+
+    Ok(units)
+}
+
 fn find_service_files(dir: &Path) -> anyhow::Result<Vec<PathBuf>> {
     let mut result = Vec::new();
     let entries = fs::read_dir(dir)?;
