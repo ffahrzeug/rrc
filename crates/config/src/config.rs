@@ -22,8 +22,8 @@ fn find_service_files(dir: &Path) -> anyhow::Result<Vec<PathBuf>> {
     Ok(result)
 }
 
-fn parse_service_file(path: PathBuf) -> anyhow::Result<Unit> {
-    let content = fs::read_to_string(path)?;
+fn parse_service_file(file_path: &Path) -> anyhow::Result<Unit> {
+    let content = fs::read_to_string(file_path)?;
     let unit = toml::from_str(&content)?;
     Ok(unit)
 }
